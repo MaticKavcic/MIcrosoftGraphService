@@ -8,7 +8,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <None Include="NLog*.config">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <PackageReference Include="Microsoft.Graph" Version="5.91.0" />
     <PackageReference Include="NLog" Version="6.0.3" />
   </ItemGroup>
 
