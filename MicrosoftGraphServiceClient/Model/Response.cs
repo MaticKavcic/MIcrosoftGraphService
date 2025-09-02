@@ -1,6 +1,4 @@
-﻿using Microsoft.Graph.Models;
-
-namespace MicrosoftGraphService.Model
+﻿namespace MicrosoftGraphService.Model
 {
     public enum ResponseType
     {
@@ -53,23 +51,23 @@ namespace MicrosoftGraphService.Model
 
     class GetEmailsResponse : Response
     {
-        public GetEmailsResponse(Message[] emails)
+        public GetEmailsResponse(Email[] emails)
         {
             Type = ResponseType.OK;
             Emails = emails;
         }
 
-        public Message[] Emails { get; set; }
+        public Email[] Emails { get; set; }
     }
 
     class GetEmailsDetailedResponse : Response
     {
-        public GetEmailsDetailedResponse(Message[] emails)
+        public GetEmailsDetailedResponse(Email[] emails)
         {
             Type = ResponseType.OK;
             Emails = emails;
         }
 
-        public Message[] Emails { get; set; }
+        public Email[] Emails { get; set; }
     }
 }

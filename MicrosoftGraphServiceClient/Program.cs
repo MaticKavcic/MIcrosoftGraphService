@@ -1,6 +1,4 @@
-﻿using Azure;
-using Microsoft.Graph.Models;
-using MicrosoftGraphService.Model;
+﻿using MicrosoftGraphService.Model;
 
 namespace MicrosoftGraphServiceClient
 {
@@ -29,10 +27,14 @@ namespace MicrosoftGraphServiceClient
                 GetEmailsResponse getEmailsResponse = response;
 
                 List<string> ids = [];
-                foreach (Message email in getEmailsResponse.Emails)
+                foreach (Email email in getEmailsResponse.Emails)
                 {
-                    ids.Add(email.Id);
+                    if (email.Id == null)
+                    {
+                        continue;
+                    }
 
+                    ids.Add(email.Id);
                     Console.WriteLine(email.Id);
                 }
 
@@ -50,9 +52,9 @@ namespace MicrosoftGraphServiceClient
                 }
 
                 GetEmailsDetailedResponse getEmailsDetailedResponse = response2;
-                foreach (Message email in getEmailsDetailedResponse.Emails)
+                foreach (Email email in getEmailsDetailedResponse.Emails)
                 {
-                    Console.WriteLine(email.Body.Content);
+                    Console.WriteLine(email.Content);
                 }
                 */
 
@@ -73,9 +75,14 @@ namespace MicrosoftGraphServiceClient
                 GetEmailsResponse getEmailsResponse = response;
 
                 List<string> ids = [];
-                foreach (Message email in getEmailsResponse.Emails)
+                foreach (Email email in getEmailsResponse.Emails)
                 {
-                    Console.WriteLine(email.Id);
+                    if (email.Id == null)
+                    {
+                        continue;
+                    }
+
+                    Console.WriteLine($"ID: {email.Id}");
 
                     Union<OkResponse, ErrorResponse> response2 = await client.DeleteEmail(email.Id);
                     if (response2.Is<ErrorResponse>())
@@ -92,25 +99,13 @@ namespace MicrosoftGraphServiceClient
                 }
                 */
 
-                var message = new Message();
+                Email newEmail = new Email();
 
-                message.Subject = "Test email";
+                newEmail.Recipients = ["st3@infrax.si"];
+                newEmail.ContentType = EmailContentType.HTML;
+                newEmail.Content = "<p>Hello, world!</p>";
 
-                message.Body = new ItemBody();
-                message.Body.Content = "<p>Hello, world!</p>";
-                message.Body.ContentType = BodyType.Html;
-
-                Recipient recipient = new Recipient();
-                recipient.EmailAddress = new EmailAddress();
-                recipient.EmailAddress.Address = "st3@infrax.si";
-
-                message.ToRecipients = [ recipient ];
-                message.CcRecipients = new List<Recipient>();
-                message.BccRecipients = new List<Recipient>();
-                message.ReplyTo = new List<Recipient>();
-                message.Attachments = new List<Attachment>();
-
-                Union<OkResponse, ErrorResponse> response = await client.SendEmail(message);
+                Union<OkResponse, ErrorResponse> response = await client.SendEmail(newEmail);
                 if (response.Is<ErrorResponse>())
                 {
                     ErrorResponse errorResponse = response;
@@ -138,9 +133,9 @@ namespace MicrosoftGraphServiceClient
 
                 GetEmailsResponse getEmailsResponse = response2;
 
-                foreach (Message email in getEmailsResponse.Emails)
+                foreach (Email email in getEmailsResponse.Emails)
                 {
-                    Console.WriteLine(email.Id);
+                    Console.WriteLine($"ID: {email.Id}");
                 }
             }
             catch (Exception ex)

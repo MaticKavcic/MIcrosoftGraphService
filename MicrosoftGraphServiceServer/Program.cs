@@ -22,7 +22,7 @@ namespace MicrosoftGraphServiceServer
                 return JsonSerializer.Serialize(new ErrorResponse("Failed to retrive emails."));
             }
 
-            return JsonSerializer.Serialize(new GetEmailsResponse(emails.ToArray()));
+            return JsonSerializer.Serialize(new GetEmailsResponse(Utils.MessagesToEmails(emails.ToArray()).ToArray()));
         }
 
         static async Task<string> GetEmailsDetailedHandler(string request)
@@ -39,7 +39,7 @@ namespace MicrosoftGraphServiceServer
                 return JsonSerializer.Serialize(new ErrorResponse("Failed to retrive detailed emails."));
             }
 
-            return JsonSerializer.Serialize(new GetEmailsDetailedResponse(emails.ToArray()));
+            return JsonSerializer.Serialize(new GetEmailsDetailedResponse(Utils.MessagesToEmails(emails.ToArray()).ToArray()));
         }
 
         static async Task<string> SendEmailHandler(string request)
@@ -50,7 +50,7 @@ namespace MicrosoftGraphServiceServer
                 return JsonSerializer.Serialize(new ErrorResponse("Invalid request."));
             }
 
-            if (!await graph.SendEmail(sendEmailRequest.Email))
+            if (!await graph.SendEmail(Utils.EmailToMessage(sendEmailRequest.Email)))
             {
                 return JsonSerializer.Serialize(new ErrorResponse("Failed to send an email."));
             }

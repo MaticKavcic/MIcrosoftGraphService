@@ -1,6 +1,4 @@
-﻿using Microsoft.Graph.Models;
-
-namespace MicrosoftGraphService.Model
+﻿namespace MicrosoftGraphService.Model
 {
     public enum RequestType
     {
@@ -44,13 +42,13 @@ namespace MicrosoftGraphService.Model
 
     class SendEmailRequest : Request
     {
-        public SendEmailRequest(Message email)
+        public SendEmailRequest(Email email)
         {
             Type = RequestType.SEND_EMAIL;
             Email = email;
         }
 
-        public Message Email { get; set; }
+        public Email Email { get; set; }
     }
 
     class DeleteEmailRequest : Request

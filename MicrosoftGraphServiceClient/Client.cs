@@ -127,7 +127,7 @@ namespace MicrosoftGraphServiceClient
             }
         }
 
-        public async Task<Union<OkResponse, ErrorResponse>> SendEmail(Microsoft.Graph.Models.Message email)
+        public async Task<Union<OkResponse, ErrorResponse>> SendEmail(Email email)
         {
             try
             {
