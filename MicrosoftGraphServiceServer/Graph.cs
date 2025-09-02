@@ -10,19 +10,19 @@ namespace MicrosoftGraphServiceServer
     {
         private static readonly NLog.Logger logger = NLog.LogManager.GetCurrentClassLogger();
 
-        private readonly Settings settings;
+        private readonly string email;
         private readonly GraphServiceClient graphClient;
 
-        public Graph(Settings settings)
+        public Graph(string email, string secret, string clientId, string tenantId)
         {
             try
             {
-                this.settings = settings;
+                this.email = email;
 
                 IConfidentialClientApplication confidentialClient = ConfidentialClientApplicationBuilder
-                        .Create(settings.ClientId)
-                        .WithTenantId(settings.TenantId)
-                        .WithClientSecret(settings.Secret)
+                        .Create(clientId)
+                        .WithTenantId(tenantId)
+                        .WithClientSecret(secret)
                         .Build();
 
                 string[] scopes = ["https://graph.microsoft.com/.default"];
@@ -42,11 +42,11 @@ namespace MicrosoftGraphServiceServer
             }
         }
 
-        public async Task<List<Message>?> GetEmails(int top)
+        public async Task<List<Message>> GetEmails(int top)
         {
             try
             {
-                MessageCollectionResponse response = await graphClient.Users[settings.Email].Messages.GetAsync(x =>
+                MessageCollectionResponse response = await graphClient.Users[email].Messages.GetAsync(x =>
                 {
                     x.QueryParameters.Top = top;
                     x.QueryParameters.Select = [
@@ -59,9 +59,9 @@ namespace MicrosoftGraphServiceServer
                         "subject"
                     ];
                 });
-                if (response == null)
+                if (response == null || response.Value == null)
                 {
-                    return null;
+                    throw new Exception("No emails meet the required criteria.");
                 }
 
                 return response.Value;
@@ -70,7 +70,7 @@ namespace MicrosoftGraphServiceServer
             {
                 logger.Error(ex);
 
-                return null;
+                throw;
             }
         }
 
@@ -82,7 +82,7 @@ namespace MicrosoftGraphServiceServer
             {
                 foreach (string email in emails)
                 {
-                    Message? message = await graphClient.Users[settings.Email].Messages[email].GetAsync();
+                    Message? message = await graphClient.Users[this.email].Messages[email].GetAsync();
                     if (message == null)
                     {
                         continue;
@@ -90,16 +90,17 @@ namespace MicrosoftGraphServiceServer
 
                     messages.Add(message);
                 }
+
+                return messages;
             }
             catch (Exception ex)
             {
                 logger.Error(ex);
+                throw;
             }
-
-            return messages;
         }
 
-        public async Task<bool> SendEmail(Message message)
+        public async void SendEmail(Message message)
         {
             try
             {
@@ -107,31 +108,25 @@ namespace MicrosoftGraphServiceServer
                 request.Message = message;
                 request.SaveToSentItems = true;
 
-                await graphClient.Users[settings.Email].SendMail.PostAsync(request);
-
-                return true;
+                await graphClient.Users[email].SendMail.PostAsync(request);
             }
             catch (Exception ex)
             {
                 logger.Error(ex);
-
-                return false;
+                throw;
             }
         }
 
-        public async Task<bool> DeleteEmail(string email)
+        public async void DeleteEmail(string email)
         {
             try
             {
-                await graphClient.Users[settings.Email].Messages[email].DeleteAsync();
-
-                return true;
+                await graphClient.Users[this.email].Messages[email].DeleteAsync();
             }
             catch (Exception ex)
             {
                 logger.Error(ex);
-
-                return false;
+                throw;
             }
         }
     }

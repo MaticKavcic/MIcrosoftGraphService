@@ -11,6 +11,24 @@ namespace MicrosoftGraphServiceClient
             {
                 Client client = new Client("MicrosoftGraphService");
 
+                Union<OkResponse, ErrorResponse> config_response = await client.Config(
+                    "",
+                    "",
+                    "",
+                    ""
+                );
+                if (config_response.Is<ErrorResponse>())
+                {
+                    ErrorResponse errorResponse = config_response;
+
+                    foreach (string error in errorResponse.Errors)
+                    {
+                        Console.WriteLine(error);
+                    }
+
+                    Environment.Exit(1);
+                }
+
                 /*
                 Union<GetEmailsResponse, ErrorResponse> response = await client.GetEmails(100);
                 if (response.Is<ErrorResponse>()) {
@@ -99,6 +117,7 @@ namespace MicrosoftGraphServiceClient
                 }
                 */
 
+                /*
                 Email newEmail = new Email();
 
                 newEmail.Recipients = ["st3@infrax.si"];
@@ -137,6 +156,7 @@ namespace MicrosoftGraphServiceClient
                 {
                     Console.WriteLine($"ID: {email.Id}");
                 }
+                */
             }
             catch (Exception ex)
             {
