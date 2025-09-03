@@ -47,7 +47,7 @@ namespace MicrosoftGraphServiceClient
             return Encoding.UTF8.GetString(messageBuffer, 0, messageBuffer.Length);
         }
 
-        public async Task<Union<OkResponse, ErrorResponse>> Config(string email, string secret, string clientId, string tenantId)
+        public async Task<OkResponse> Config(string email, string secret, string clientId, string tenantId)
         {
             try
             {
@@ -73,7 +73,7 @@ namespace MicrosoftGraphServiceClient
                             throw new Exception("Failed to parse response.");
                         }
 
-                        return new Union<OkResponse, ErrorResponse>(okResponse);
+                        return okResponse;
                     default:
                         ErrorResponse? errorResponse = JsonSerializer.Deserialize<ErrorResponse>(response);
                         if (errorResponse == null)
@@ -81,7 +81,7 @@ namespace MicrosoftGraphServiceClient
                             throw new Exception("Failed to parse response.");
                         }
 
-                        return new Union<OkResponse, ErrorResponse>(errorResponse);
+                        throw new Exception(errorResponse.Error);
                 }
             }
             catch (Exception ex)
@@ -91,7 +91,7 @@ namespace MicrosoftGraphServiceClient
             }
         }
 
-        public async Task<Union<GetEmailsResponse, ErrorResponse>> GetEmails(int top)
+        public async Task<GetEmailsResponse> GetEmails(int top)
         {
             try
             {
@@ -112,7 +112,7 @@ namespace MicrosoftGraphServiceClient
                             throw new Exception("Failed to parse response.");
                         }
 
-                        return new Union<GetEmailsResponse, ErrorResponse>(getEmailsResponse);
+                        return getEmailsResponse;
                 default:
                         ErrorResponse? errorResponse = JsonSerializer.Deserialize<ErrorResponse>(response);
                         if (errorResponse == null)
@@ -120,7 +120,7 @@ namespace MicrosoftGraphServiceClient
                             throw new Exception("Failed to parse response.");
                         }
 
-                        return new Union<GetEmailsResponse, ErrorResponse>(errorResponse);
+                        throw new Exception(errorResponse.Error);
                 }
             }
             catch (Exception ex)
@@ -130,7 +130,7 @@ namespace MicrosoftGraphServiceClient
             }
         }
 
-        public async Task<Union<GetEmailsDetailedResponse, ErrorResponse>> GetEmailsDetailed(string[] emails)
+        public async Task<GetEmailsDetailedResponse> GetEmailsDetailed(string[] emails)
         {
             try
             {
@@ -151,7 +151,7 @@ namespace MicrosoftGraphServiceClient
                             throw new Exception("Failed to parse response.");
                         }
 
-                        return new Union<GetEmailsDetailedResponse, ErrorResponse>(getEmailsDetailedResponse);
+                        return getEmailsDetailedResponse;
                     default:
                         ErrorResponse? errorResponse = JsonSerializer.Deserialize<ErrorResponse>(response);
                         if (errorResponse == null)
@@ -159,18 +159,17 @@ namespace MicrosoftGraphServiceClient
                             throw new Exception("Failed to parse response.");
                         }
 
-                        return new Union<GetEmailsDetailedResponse, ErrorResponse>(errorResponse);
+                        throw new Exception(errorResponse.Error);
                 }
             }
             catch (Exception ex)
             {
                 logger.Error(ex);
-
                 throw;
             }
         }
 
-        public async Task<Union<OkResponse, ErrorResponse>> SendEmail(Email email)
+        public async Task<OkResponse> SendEmail(Email email)
         {
             try
             {
@@ -191,7 +190,7 @@ namespace MicrosoftGraphServiceClient
                             throw new Exception("Failed to parse response.");
                         }
 
-                        return new Union<OkResponse, ErrorResponse>(okResponse);
+                        return okResponse;
                     default:
                         ErrorResponse? errorResponse = JsonSerializer.Deserialize<ErrorResponse>(response);
                         if (errorResponse == null)
@@ -199,18 +198,17 @@ namespace MicrosoftGraphServiceClient
                             throw new Exception("Failed to parse response.");
                         }
 
-                        return new Union<OkResponse, ErrorResponse>(errorResponse);
+                        throw new Exception(errorResponse.Error);
                 }
             }
             catch (Exception ex)
             {
                 logger.Error(ex);
-
                 throw;
             }
         }
 
-        public async Task<Union<OkResponse, ErrorResponse>> DeleteEmail(string email)
+        public async Task<OkResponse> DeleteEmail(string email)
         {
             try
             {
@@ -231,7 +229,7 @@ namespace MicrosoftGraphServiceClient
                             throw new Exception("Failed to parse response.");
                         }
 
-                        return new Union<OkResponse, ErrorResponse>(okResponse);
+                        return okResponse;
                     default:
                         ErrorResponse? errorResponse = JsonSerializer.Deserialize<ErrorResponse>(response);
                         if (errorResponse == null)
@@ -239,13 +237,12 @@ namespace MicrosoftGraphServiceClient
                             throw new Exception("Failed to parse response.");
                         }
 
-                        return new Union<OkResponse, ErrorResponse>(errorResponse);
+                        throw new Exception(errorResponse.Error);
                 }
             }
             catch (Exception ex)
             {
                 logger.Error(ex);
-
                 throw;
             }
         }

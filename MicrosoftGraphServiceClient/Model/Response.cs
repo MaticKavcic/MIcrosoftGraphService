@@ -26,27 +26,13 @@
 
     class ErrorResponse : Response
     {
-        public ErrorResponse()
-        {
-            Type = ResponseType.ERR;
-            Errors = [];
-        }
-
         public ErrorResponse(string error)
         {
             Type = ResponseType.ERR;
-            Errors = [
-                error
-            ];
+            Error = error;
         }
 
-        public ErrorResponse(string[] errors)
-        {
-            Type = ResponseType.ERR;
-            Errors = errors;
-        }
-
-        public string[] Errors { get; set; }
+        public string Error { get; set; }
     }
 
     class GetEmailsResponse : Response

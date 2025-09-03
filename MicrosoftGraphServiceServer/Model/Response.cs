@@ -1,13 +1,15 @@
 ﻿namespace MicrosoftGraphService.Model
 {
-    public enum ResponseType {
+    public enum ResponseType
+    {
         OK = 0,
         ERR = 1
     }
 
     class Response
     {
-        public Response() {
+        public Response()
+        {
             Type = ResponseType.OK;
         }
 
@@ -22,28 +24,15 @@
         }
     }
 
-    class ErrorResponse : Response {
-        public ErrorResponse()
-        {
-            Type = ResponseType.ERR;
-            Errors = [];
-        }
-
+    class ErrorResponse : Response
+    {
         public ErrorResponse(string error)
         {
             Type = ResponseType.ERR;
-            Errors = [
-                error
-            ];
+            Error = error;
         }
 
-        public ErrorResponse(string[] errors)
-        {
-            Type = ResponseType.ERR;
-            Errors = errors;
-        }
-
-        public string[] Errors { get; set; }
+        public string Error { get; set; }
     }
 
     class GetEmailsResponse : Response

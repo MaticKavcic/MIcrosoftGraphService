@@ -11,38 +11,15 @@ namespace MicrosoftGraphServiceClient
             {
                 Client client = new Client("MicrosoftGraphService");
 
-                Union<OkResponse, ErrorResponse> config_response = await client.Config(
+                await client.Config(
                     "",
                     "",
                     "",
                     ""
                 );
-                if (config_response.Is<ErrorResponse>())
-                {
-                    ErrorResponse errorResponse = config_response;
-
-                    foreach (string error in errorResponse.Errors)
-                    {
-                        Console.WriteLine(error);
-                    }
-
-                    Environment.Exit(1);
-                }
 
                 /*
-                Union<GetEmailsResponse, ErrorResponse> response = await client.GetEmails(100);
-                if (response.Is<ErrorResponse>()) {
-                    ErrorResponse errorResponse = response;
-
-                    foreach (string error in errorResponse.Errors)
-                    {
-                        Console.WriteLine(error);
-                    }
-
-                    Environment.Exit(1);
-                }
-
-                GetEmailsResponse getEmailsResponse = response;
+                GetEmailsResponse getEmailsResponse = await client.GetEmails(100);
 
                 List<string> ids = [];
                 foreach (Email email in getEmailsResponse.Emails)
@@ -56,20 +33,7 @@ namespace MicrosoftGraphServiceClient
                     Console.WriteLine(email.Id);
                 }
 
-                Union<GetEmailsDetailedResponse, ErrorResponse> response2 = await client.GetEmailsDetailed(ids.ToArray());
-                if (response2.Is<ErrorResponse>())
-                {
-                    ErrorResponse errorResponse = response2;
-
-                    foreach (string error in errorResponse.Errors)
-                    {
-                        Console.WriteLine(error);
-                    }
-
-                    Environment.Exit(1);
-                }
-
-                GetEmailsDetailedResponse getEmailsDetailedResponse = response2;
+                GetEmailsDetailedResponse getEmailsDetailedResponse = await client.GetEmailsDetailed(ids.ToArray());
                 foreach (Email email in getEmailsDetailedResponse.Emails)
                 {
                     Console.WriteLine(email.Content);
@@ -77,20 +41,7 @@ namespace MicrosoftGraphServiceClient
                 */
 
                 /*
-                Union<GetEmailsResponse, ErrorResponse> response = await client.GetEmails(100);
-                if (response.Is<ErrorResponse>())
-                {
-                    ErrorResponse errorResponse = response;
-
-                    foreach (string error in errorResponse.Errors)
-                    {
-                        Console.WriteLine(error);
-                    }
-
-                    Environment.Exit(1);
-                }
-
-                GetEmailsResponse getEmailsResponse = response;
+                GetEmailsResponse getEmailsResponse = await client.GetEmails(100);
 
                 List<string> ids = [];
                 foreach (Email email in getEmailsResponse.Emails)
@@ -101,19 +52,7 @@ namespace MicrosoftGraphServiceClient
                     }
 
                     Console.WriteLine($"ID: {email.Id}");
-
-                    Union<OkResponse, ErrorResponse> response2 = await client.DeleteEmail(email.Id);
-                    if (response2.Is<ErrorResponse>())
-                    {
-                        ErrorResponse errorResponse = response2;
-
-                        foreach (string error in errorResponse.Errors)
-                        {
-                            Console.WriteLine(error);
-                        }
-
-                        Environment.Exit(1);
-                    }
+                    await client.DeleteEmail(email.Id);
                 }
                 */
 
@@ -124,34 +63,9 @@ namespace MicrosoftGraphServiceClient
                 newEmail.ContentType = EmailContentType.HTML;
                 newEmail.Content = "<p>Hello, world!</p>";
 
-                Union<OkResponse, ErrorResponse> response = await client.SendEmail(newEmail);
-                if (response.Is<ErrorResponse>())
-                {
-                    ErrorResponse errorResponse = response;
+                await client.SendEmail(newEmail);
 
-                    foreach (string error in errorResponse.Errors)
-                    {
-                        Console.WriteLine(error);
-                    }
-
-                    Environment.Exit(1);
-                }
-
-                Union<GetEmailsResponse, ErrorResponse> response2 = await client.GetEmails(100);
-                if (response2.Is<ErrorResponse>())
-                {
-                    ErrorResponse errorResponse = response2;
-
-                    foreach (string error in errorResponse.Errors)
-                    {
-                        Console.WriteLine(error);
-                    }
-
-                    Environment.Exit(1);
-                }
-
-                GetEmailsResponse getEmailsResponse = response2;
-
+                GetEmailsResponse getEmailsResponse = await client.GetEmails(100);
                 foreach (Email email in getEmailsResponse.Emails)
                 {
                     Console.WriteLine($"ID: {email.Id}");

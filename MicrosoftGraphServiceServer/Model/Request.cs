@@ -12,7 +12,8 @@
 
     class Request
     {
-        public Request() {
+        public Request()
+        {
             Type = RequestType.NONE;
         }
 
