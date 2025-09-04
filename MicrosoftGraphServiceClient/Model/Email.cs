@@ -6,7 +6,6 @@
         HTML = 1
     }
 
-    /*
     class EmailAttachment
     {
         public string? Id { get; set; }
@@ -15,9 +14,8 @@
         public bool? Inline { get; set; }
         public int? Size { get; set; }
         public string? ContentType { get; set; }
-        public string? Content { get; set; }
+        public byte[]? Content { get; set; }
     }
-    */
 
     class Email
     {
@@ -30,6 +28,6 @@
         public string? Subject { get; set; }
         public EmailContentType ContentType { get; set; }
         public string? Content { get; set; }
-        // public EmailAttachment[]? Attachments { get; set; }
+        public EmailAttachment[]? Attachments { get; set; }
     }
 }

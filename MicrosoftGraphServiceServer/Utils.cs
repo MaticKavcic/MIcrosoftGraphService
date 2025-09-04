@@ -90,6 +90,34 @@ namespace MicrosoftGraphServiceServer
                 }
             }
 
+            if (message.Attachments != null)
+            {
+                List<EmailAttachment> emailAttachments = [];
+
+                foreach (Attachment attachment in message.Attachments)
+                {
+                    if (attachment is not FileAttachment)
+                    {
+                        continue;
+                    }
+
+                    FileAttachment fileAttachment = (FileAttachment)attachment;
+                    EmailAttachment emailAttachment = new EmailAttachment();
+
+                    emailAttachment.Id = fileAttachment.Id;
+                    emailAttachment.LastModified = fileAttachment.LastModifiedDateTime;
+                    emailAttachment.Name = fileAttachment.Name;
+                    emailAttachment.Inline = fileAttachment.IsInline;
+                    emailAttachment.Size = fileAttachment.Size;
+                    emailAttachment.ContentType = fileAttachment.ContentType;
+                    emailAttachment.Content = fileAttachment.ContentBytes;
+
+                    emailAttachments.Add(emailAttachment);
+                }
+
+                email.Attachments = emailAttachments.ToArray();
+            }
+
             return email;
         }
 
@@ -146,6 +174,25 @@ namespace MicrosoftGraphServiceServer
                 case EmailContentType.HTML:
                     message.Body.ContentType = BodyType.Html;
                     break;
+            }
+
+            if (email.Attachments != null)
+            {
+                message.Attachments = [];
+
+                foreach (EmailAttachment attachment in email.Attachments)
+                {
+                    message.Attachments.Add(new FileAttachment
+                    {
+                        Id = attachment.Id,
+                        LastModifiedDateTime = attachment.LastModified,
+                        Name = attachment.Name,
+                        IsInline = attachment.Inline,
+                        Size = attachment.Size,
+                        ContentType = attachment.ContentType,
+                        ContentBytes = attachment.Content
+                    });
+                }
             }
 
             return message;

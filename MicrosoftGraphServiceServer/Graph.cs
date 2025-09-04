@@ -82,7 +82,12 @@ namespace MicrosoftGraphServiceServer
             {
                 foreach (string email in emails)
                 {
-                    Message? message = await graphClient.Users[this.email].Messages[email].GetAsync();
+                    Message? message = await graphClient.Users[this.email].Messages[email].GetAsync(x => 
+                    {
+                        x.QueryParameters.Expand = [
+                            "attachments"
+                        ];
+                    });
                     if (message == null)
                     {
                         continue;

@@ -36,7 +36,7 @@ namespace MicrosoftGraphServiceServer
             pipeServer = new NamedPipeServerStream(
                 pipeName,
                 PipeDirection.InOut,
-                254,
+                NamedPipeServerStream.MaxAllowedServerInstances,
                 PipeTransmissionMode.Byte,
                 PipeOptions.Asynchronous
             );
@@ -89,11 +89,6 @@ namespace MicrosoftGraphServiceServer
                     }
 
                     int messageLength = BitConverter.ToInt32(lengthBuffer, 0);
-                    if (messageLength < 0 || messageLength > 1024 * 1024)
-                    {
-                        throw new ArgumentOutOfRangeException("Message length is out of bounds.");
-                    }
-
                     var messageBuffer = new byte[messageLength];
                     await pipeServer.ReadExactlyAsync(messageBuffer);
 

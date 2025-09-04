@@ -6,8 +6,6 @@ namespace MicrosoftGraphServiceServer
 {
     static class Program
     {
-        private static readonly NLog.Logger logger = NLog.LogManager.GetCurrentClassLogger();
-
         private static Graph? graph;
         private static Server? server;
 
@@ -68,7 +66,7 @@ namespace MicrosoftGraphServiceServer
 
             try
             {
-                List<Message>? emails = await graph.GetEmailsDetailed(getEmailsDetailedRequest.Emails);
+                List<Message> emails = await graph.GetEmailsDetailed(getEmailsDetailedRequest.Emails);
 
                 return JsonSerializer.Serialize(new GetEmailsDetailedResponse(Utils.MessagesToEmails(emails.ToArray()).ToArray()));
             }
