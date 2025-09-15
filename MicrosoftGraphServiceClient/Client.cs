@@ -1,50 +1,16 @@
-﻿using System.Text;
-using System.Text.Json;
-using System.IO.Pipes;
+﻿using System.Text.Json;
+using MicrosoftGraphService.Shared;
 using MicrosoftGraphService.Model;
 
 namespace MicrosoftGraphServiceClient
 {
-    class Client
+    class Client : PipeClient
     {
         private static readonly NLog.Logger logger = NLog.LogManager.GetCurrentClassLogger();
 
-        private readonly string pipeName;
-
-        public Client(string pipeName) {
-            this.pipeName = pipeName;
-        }
-
-        public async Task<string> Send(string request, int timeOut = 1000)
+        public Client(string pipeName) : base(pipeName)
         {
-            NamedPipeClientStream pipeClient = new NamedPipeClientStream(
-                ".",
-                pipeName,
-                PipeDirection.InOut,
-                PipeOptions.Asynchronous
-            );
-
-            pipeClient.Connect();
-
-            byte[] lengthBuffer = new byte[4];
-            byte[] writeBuffer = Encoding.UTF8.GetBytes(request);
-            lengthBuffer = BitConverter.GetBytes(writeBuffer.Length);
-
-            await pipeClient.WriteAsync(lengthBuffer, 0, lengthBuffer.Length);
-            await pipeClient.WriteAsync(writeBuffer, 0, writeBuffer.Length);
-
-            int readByte = await pipeClient.ReadAsync(lengthBuffer, 0, lengthBuffer.Length);
-
-            if (readByte != 4)
-            {
-                throw new Exception("Invalid message length in pipe.");
-            }
-
-            int messageLength = BitConverter.ToInt32(lengthBuffer, 0);
-            byte[] messageBuffer = new byte[messageLength];
-            readByte = await pipeClient.ReadAsync(messageBuffer, 0, messageBuffer.Length);
-
-            return Encoding.UTF8.GetString(messageBuffer, 0, messageBuffer.Length);
+        
         }
 
         public async Task<OkResponse> Config(string email, string secret, string clientId, string tenantId)

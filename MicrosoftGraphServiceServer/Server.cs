@@ -1,29 +1,20 @@
-﻿using System.Text;
-using System.IO.Pipes;
-using System.Text.Json;
+﻿using System.Text.Json;
 using MicrosoftGraphService.Model;
+using MicrosoftGraphService.Shared;
 
 namespace MicrosoftGraphServiceServer
 {
-    class Server : IDisposable
+    class Server : PipeServer
     {
         public delegate Task<string> RequestHandler(string request);
 
         private static readonly NLog.Logger logger = NLog.LogManager.GetCurrentClassLogger();
 
-        private readonly string pipeName;
-        private NamedPipeServerStream? pipeServer;
         private readonly Dictionary<RequestType, RequestHandler> handlers;
 
-        public Server(string pipeName)
+        public Server(string pipeName) : base(pipeName)
         {
-            this.pipeName = pipeName;
             handlers = [];
-        }
-
-        public void Dispose()
-        {
-            pipeServer?.Dispose();
         }
 
         public void SetRequestHandler(RequestType type, RequestHandler handler)
@@ -31,23 +22,7 @@ namespace MicrosoftGraphServiceServer
             handlers[type] = handler;
         }
 
-        public void Listen()
-        {
-            pipeServer = new NamedPipeServerStream(
-                pipeName,
-                PipeDirection.InOut,
-                NamedPipeServerStream.MaxAllowedServerInstances,
-                PipeTransmissionMode.Byte,
-                PipeOptions.Asynchronous
-            );
-
-            pipeServer.BeginWaitForConnection(
-               new AsyncCallback(ConnectionCallBack),
-               pipeServer
-            );
-        }
-
-        private async Task<string> MessageCallback(string message)
+        protected override async Task<string> HandleRequest(string message)
         {
             Request? request = JsonSerializer.Deserialize<Request>(message);
             if (request == null)
@@ -66,47 +41,6 @@ namespace MicrosoftGraphServiceServer
                 logger.Error("Client has made a request that has no registered handler.");
 
                 return JsonSerializer.Serialize(new ErrorResponse("This request does not have a registered handler."));
-            }
-        }
-
-        private async void ConnectionCallBack(IAsyncResult iar)
-        {
-            logger.Trace("Client connection recived.");
-
-            try
-            {
-                Listen();
-
-                using (NamedPipeServerStream pipeServer = (NamedPipeServerStream)iar.AsyncState)
-                {
-                    pipeServer.EndWaitForConnection(iar);
-
-                    byte[] lengthBuffer = new byte[4];
-                    int readByte = await pipeServer.ReadAsync(lengthBuffer, 0, lengthBuffer.Length);
-                    if (readByte != 4)
-                    {
-                        throw new Exception("Invalid message length in pipe.");
-                    }
-
-                    int messageLength = BitConverter.ToInt32(lengthBuffer, 0);
-                    var messageBuffer = new byte[messageLength];
-                    await pipeServer.ReadExactlyAsync(messageBuffer);
-
-                    string message = Encoding.UTF8.GetString(messageBuffer, 0, messageBuffer.Length);
-
-                    string reply = await MessageCallback(message);
-
-                    var replyBytes = Encoding.UTF8.GetBytes(reply);
-                    lengthBuffer = BitConverter.GetBytes(replyBytes.Length);
-
-                    await pipeServer.WriteAsync(lengthBuffer);
-                    await pipeServer.WriteAsync(replyBytes);
-                }
-            }
-            catch (ObjectDisposedException) { }
-            catch (Exception ex)
-            {
-                logger.Error(ex);
             }
         }
     }
