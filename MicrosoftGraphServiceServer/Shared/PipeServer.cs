@@ -41,7 +41,7 @@ namespace MicrosoftGraphService.Shared
             return "";
         }
 
-        private async void ConnectionCallBack(IAsyncResult iar)
+        private async Task ConnectionCallBack(IAsyncResult iar)
         {
             logger.Trace("Client connection recived.");
 

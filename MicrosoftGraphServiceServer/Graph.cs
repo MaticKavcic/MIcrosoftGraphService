@@ -105,7 +105,7 @@ namespace MicrosoftGraphServiceServer
             }
         }
 
-        public async void SendEmail(Message message)
+        public async Task SendEmail(Message message)
         {
             try
             {
@@ -122,7 +122,7 @@ namespace MicrosoftGraphServiceServer
             }
         }
 
-        public async void DeleteEmail(string email)
+        public async Task DeleteEmail(string email)
         {
             try
             {
