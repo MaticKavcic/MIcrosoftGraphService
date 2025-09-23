@@ -3,11 +3,10 @@
     public enum RequestType
     {
         NONE = 0,
-        CONFIG = 1,
-        GET_EMAILS = 2,
-        GET_EMAILS_DETAILED = 3,
-        SEND_EMAIL = 4,
-        DELETE_EMAIL = 5
+        GET_EMAILS = 1,
+        GET_EMAILS_DETAILED = 2,
+        SEND_EMAIL = 3,
+        DELETE_EMAIL = 4
     }
 
     class Request
@@ -20,64 +19,55 @@
         public RequestType Type { get; set; }
     }
 
-    class ConfigRequest : Request
-    {
-        public ConfigRequest(string email, string secret, string clientId, string tenantId)
-        {
-            Type = RequestType.CONFIG;
-            Email = email;
-            Secret = secret;
-            ClientId = clientId;
-            TenantId = tenantId;
-        }
-
-        public string Email { get; set; }
-        public string Secret { get; set; }
-        public string ClientId { get; set; }
-        public string TenantId { get; set; }
-    }
-
     class GetEmailsRequest : Request
     {
-        public GetEmailsRequest(int top)
+        public GetEmailsRequest(Credentials credentials, int top)
         {
             Type = RequestType.GET_EMAILS;
+            Credentials = credentials;
             Top = top;
         }
 
+        public Credentials Credentials { get; set; }
         public int Top { get; set; }
     }
 
     class GetEmailsDetailedRequest : Request
     {
-        public GetEmailsDetailedRequest(string[] emails)
+        public GetEmailsDetailedRequest(Credentials credentials, string[] emails)
         {
             Type = RequestType.GET_EMAILS_DETAILED;
+            Credentials = credentials;
             Emails = emails;
         }
 
+        public Credentials Credentials { get; set; }
         public string[] Emails { get; set; }
     }
 
     class SendEmailRequest : Request
     {
-        public SendEmailRequest(Email email)
+        public SendEmailRequest(Credentials credentials, Email email)
         {
             Type = RequestType.SEND_EMAIL;
+            Credentials = credentials;
             Email = email;
         }
 
+        public Credentials Credentials { get; set; }
         public Email Email { get; set; }
     }
 
     class DeleteEmailRequest : Request
     {
-        public DeleteEmailRequest(string email)
+        public DeleteEmailRequest(Credentials credentials, string email)
         {
             Type = RequestType.DELETE_EMAIL;
+            Credentials = credentials;
             Email = email;
         }
 
+        public Credentials Credentials { get; set; }
         public string Email { get; set; }
     }
 }

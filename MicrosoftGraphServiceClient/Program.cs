@@ -10,13 +10,14 @@ namespace MicrosoftGraphServiceClient
         static async Task Main(string[] args) {
             try
             {
-                Client client = new Client("MicrosoftGraphService");
-
-                await client.Config(
-                    "",
-                    "",
-                    "",
-                    ""
+                Client client = new Client(
+                    "MicrosoftGraphService",
+                    new Credentials(
+                        "",
+                        "",
+                        "",
+                        ""
+                    )
                 );
 
                 /*

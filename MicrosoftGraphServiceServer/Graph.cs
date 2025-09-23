@@ -2,6 +2,7 @@
 using Microsoft.Graph.Models;
 using Microsoft.Graph.Users.Item.SendMail;
 using Microsoft.Identity.Client;
+using MicrosoftGraphService.Model;
 using System.Net.Http.Headers;
 
 namespace MicrosoftGraphServiceServer
@@ -13,16 +14,16 @@ namespace MicrosoftGraphServiceServer
         private readonly string email;
         private readonly GraphServiceClient graphClient;
 
-        public Graph(string email, string secret, string clientId, string tenantId)
+        public Graph(Credentials credentials)
         {
             try
             {
-                this.email = email;
+                this.email = credentials.Email;
 
                 IConfidentialClientApplication confidentialClient = ConfidentialClientApplicationBuilder
-                        .Create(clientId)
-                        .WithTenantId(tenantId)
-                        .WithClientSecret(secret)
+                        .Create(credentials.ClientId)
+                        .WithTenantId(credentials.TenantId)
+                        .WithClientSecret(credentials.Secret)
                         .Build();
 
                 string[] scopes = ["https://graph.microsoft.com/.default"];

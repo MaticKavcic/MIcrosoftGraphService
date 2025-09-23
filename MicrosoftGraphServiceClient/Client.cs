@@ -8,60 +8,18 @@ namespace MicrosoftGraphServiceClient
     {
         private static readonly NLog.Logger logger = NLog.LogManager.GetCurrentClassLogger();
 
-        public Client(string pipeName) : base(pipeName)
+        private readonly Credentials credentials;
+
+        public Client(string pipeName, Credentials credentials) : base(pipeName)
         {
-        
-        }
-
-        public async Task<OkResponse> Config(string email, string secret, string clientId, string tenantId)
-        {
-            try
-            {
-                string response = await Send(JsonSerializer.Serialize(new ConfigRequest(
-                    email,
-                    secret,
-                    clientId,
-                    tenantId
-                )));
-
-                Response? responseObj = JsonSerializer.Deserialize<Response>(response);
-                if (responseObj == null)
-                {
-                    throw new Exception("Failed to parse response.");
-                }
-
-                switch (responseObj.Type)
-                {
-                    case ResponseType.OK:
-                        OkResponse? okResponse = JsonSerializer.Deserialize<OkResponse>(response);
-                        if (okResponse == null)
-                        {
-                            throw new Exception("Failed to parse response.");
-                        }
-
-                        return okResponse;
-                    default:
-                        ErrorResponse? errorResponse = JsonSerializer.Deserialize<ErrorResponse>(response);
-                        if (errorResponse == null)
-                        {
-                            throw new Exception("Failed to parse response.");
-                        }
-
-                        throw new Exception(errorResponse.Error);
-                }
-            }
-            catch (Exception ex)
-            {
-                logger.Error(ex);
-                throw;
-            }
+            this.credentials = credentials;
         }
 
         public async Task<GetEmailsResponse> GetEmails(int top)
         {
             try
             {
-                string response = await Send(JsonSerializer.Serialize(new GetEmailsRequest(top)));
+                string response = await Send(JsonSerializer.Serialize(new GetEmailsRequest(credentials, top)));
 
                 Response? responseObj = JsonSerializer.Deserialize<Response>(response);
                 if (responseObj == null)
@@ -100,7 +58,7 @@ namespace MicrosoftGraphServiceClient
         {
             try
             {
-                string response = await Send(JsonSerializer.Serialize(new GetEmailsDetailedRequest(emails)));
+                string response = await Send(JsonSerializer.Serialize(new GetEmailsDetailedRequest(credentials, emails)));
 
                 Response? responseObj = JsonSerializer.Deserialize<Response>(response);
                 if (responseObj == null)
@@ -139,7 +97,7 @@ namespace MicrosoftGraphServiceClient
         {
             try
             {
-                string response = await Send(JsonSerializer.Serialize(new SendEmailRequest(email)));
+                string response = await Send(JsonSerializer.Serialize(new SendEmailRequest(credentials, email)));
 
                 Response? responseObj = JsonSerializer.Deserialize<Response>(response);
                 if (responseObj == null)
@@ -178,7 +136,7 @@ namespace MicrosoftGraphServiceClient
         {
             try
             {
-                string response = await Send(JsonSerializer.Serialize(new DeleteEmailRequest(email)));
+                string response = await Send(JsonSerializer.Serialize(new DeleteEmailRequest(credentials, email)));
 
                 Response? responseObj = JsonSerializer.Deserialize<Response>(response);
                 if (responseObj == null)

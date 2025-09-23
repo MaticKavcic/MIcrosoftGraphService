@@ -6,35 +6,9 @@ namespace MicrosoftGraphServiceServer
 {
     static class Program
     {
-        private static Graph? graph;
         private static Server? server;
 
-        static async Task<string> ConfigHandler(string request)
-        {
-            ConfigRequest? configRequest = JsonSerializer.Deserialize<ConfigRequest>(request);
-            if (configRequest == null)
-            {
-                return JsonSerializer.Serialize(new ErrorResponse("Invalid request."));
-            }
-
-            try
-            {
-                graph = new Graph(configRequest.Email, configRequest.Secret, configRequest.ClientId, configRequest.TenantId);
-            }
-            catch (Exception ex)
-            {
-                return JsonSerializer.Serialize(new ErrorResponse($"Failed to configure server: {ex.Message}"));
-            }
-
-            return JsonSerializer.Serialize(new OkResponse());
-        }
-
         static async Task<string> GetEmailsHandler(string request) {
-            if (graph == null)
-            {
-                return JsonSerializer.Serialize(new ErrorResponse("The server is not configured."));
-            }
-
             GetEmailsRequest? getEmialsRequest = JsonSerializer.Deserialize<GetEmailsRequest>(request);
             if (getEmialsRequest == null)
             {
@@ -43,6 +17,8 @@ namespace MicrosoftGraphServiceServer
 
             try
             {
+                Graph graph = new Graph(getEmialsRequest.Credentials);
+
                 List<Message> emails = await graph.GetEmails(getEmialsRequest.Top);
 
                 return JsonSerializer.Serialize(new GetEmailsResponse(Utils.MessagesToEmails(emails.ToArray()).ToArray()));
@@ -53,11 +29,6 @@ namespace MicrosoftGraphServiceServer
 
         static async Task<string> GetEmailsDetailedHandler(string request)
         {
-            if (graph == null)
-            {
-                return JsonSerializer.Serialize(new ErrorResponse("The server is not configured."));
-            }
-
             GetEmailsDetailedRequest? getEmailsDetailedRequest = JsonSerializer.Deserialize<GetEmailsDetailedRequest>(request);
             if (getEmailsDetailedRequest == null)
             {
@@ -66,6 +37,8 @@ namespace MicrosoftGraphServiceServer
 
             try
             {
+                Graph graph = new Graph(getEmailsDetailedRequest.Credentials);
+
                 List<Message> emails = await graph.GetEmailsDetailed(getEmailsDetailedRequest.Emails);
 
                 return JsonSerializer.Serialize(new GetEmailsDetailedResponse(Utils.MessagesToEmails(emails.ToArray()).ToArray()));
@@ -79,11 +52,6 @@ namespace MicrosoftGraphServiceServer
 
         static async Task<string> SendEmailHandler(string request)
         {
-            if (graph == null)
-            {
-                return JsonSerializer.Serialize(new ErrorResponse("The server is not configured."));
-            }
-
             SendEmailRequest? sendEmailRequest = JsonSerializer.Deserialize<SendEmailRequest>(request);
             if (sendEmailRequest == null)
             {
@@ -92,7 +60,9 @@ namespace MicrosoftGraphServiceServer
 
             try
             {
-                graph.SendEmail(Utils.EmailToMessage(sendEmailRequest.Email));
+                Graph graph = new Graph(sendEmailRequest.Credentials);
+
+                await graph.SendEmail(Utils.EmailToMessage(sendEmailRequest.Email));
 
                 return JsonSerializer.Serialize(new OkResponse());
             }
@@ -104,11 +74,6 @@ namespace MicrosoftGraphServiceServer
 
         static async Task<string> DeleteEmailHandler(string request)
         {
-            if (graph == null)
-            {
-                return JsonSerializer.Serialize(new ErrorResponse("The server is not configured."));
-            }
-
             DeleteEmailRequest? deleteEmailRequest = JsonSerializer.Deserialize<DeleteEmailRequest>(request);
             if (deleteEmailRequest == null)
             {
@@ -117,7 +82,9 @@ namespace MicrosoftGraphServiceServer
 
             try
             {
-                graph.DeleteEmail(deleteEmailRequest.Email);
+                Graph graph = new Graph(deleteEmailRequest.Credentials);
+
+                await graph.DeleteEmail(deleteEmailRequest.Email);
 
                 return JsonSerializer.Serialize(new OkResponse());
             }
@@ -132,7 +99,6 @@ namespace MicrosoftGraphServiceServer
             {
                 server = new Server("MicrosoftGraphService");
 
-                server.SetRequestHandler(RequestType.CONFIG, ConfigHandler);
                 server.SetRequestHandler(RequestType.GET_EMAILS, GetEmailsHandler);
                 server.SetRequestHandler(RequestType.GET_EMAILS_DETAILED, GetEmailsDetailedHandler);
                 server.SetRequestHandler(RequestType.SEND_EMAIL, SendEmailHandler);
