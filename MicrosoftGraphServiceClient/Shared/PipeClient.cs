@@ -3,7 +3,7 @@ using System.Text;
 
 namespace MicrosoftGraphService.Shared
 {
-    class PipeClient
+    public class PipeClient
     {
         private readonly string pipeName;
 

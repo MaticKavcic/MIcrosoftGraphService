@@ -4,7 +4,7 @@ using MicrosoftGraphService.Model;
 
 namespace MicrosoftGraphServiceClient
 {
-    class Client : PipeClient
+    public class Client : PipeClient
     {
         private static readonly NLog.Logger logger = NLog.LogManager.GetCurrentClassLogger();
 

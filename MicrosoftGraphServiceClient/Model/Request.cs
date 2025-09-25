@@ -9,7 +9,7 @@
         DELETE_EMAIL = 4
     }
 
-    class Request
+    public class Request
     {
         public Request()
         {
@@ -19,7 +19,7 @@
         public RequestType Type { get; set; }
     }
 
-    class GetEmailsRequest : Request
+    public class GetEmailsRequest : Request
     {
         public GetEmailsRequest(Credentials credentials, int top)
         {
@@ -32,7 +32,7 @@
         public int Top { get; set; }
     }
 
-    class GetEmailsDetailedRequest : Request
+    public class GetEmailsDetailedRequest : Request
     {
         public GetEmailsDetailedRequest(Credentials credentials, string[] emails)
         {
@@ -45,7 +45,7 @@
         public string[] Emails { get; set; }
     }
 
-    class SendEmailRequest : Request
+    public class SendEmailRequest : Request
     {
         public SendEmailRequest(Credentials credentials, Email email)
         {
@@ -58,7 +58,7 @@
         public Email Email { get; set; }
     }
 
-    class DeleteEmailRequest : Request
+    public class DeleteEmailRequest : Request
     {
         public DeleteEmailRequest(Credentials credentials, string email)
         {

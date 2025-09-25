@@ -1,12 +1,12 @@
 ﻿namespace MicrosoftGraphService.Model
 {
-    enum EmailContentType
+    public enum EmailContentType
     {
         TEXT = 0,
         HTML = 1
     }
 
-    class EmailAttachment
+    public class EmailAttachment
     {
         public string? Id { get; set; }
         public DateTimeOffset? LastModified { get; set; }
@@ -17,7 +17,7 @@
         public byte[]? Content { get; set; }
     }
 
-    class Email
+    public class Email
     {
         public string? Id { get; set; }
         public DateTimeOffset? Date { get; set; }

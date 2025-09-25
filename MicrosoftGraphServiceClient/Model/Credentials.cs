@@ -1,6 +1,6 @@
 ﻿namespace MicrosoftGraphService.Model
 {
-    class Credentials
+    public class Credentials
     {
         public Credentials(string email, string secret, string clientId, string tenantId)
         {
