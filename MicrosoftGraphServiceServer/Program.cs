@@ -1,124 +1,53 @@
-﻿using System.Text.Json;
-using Microsoft.Graph.Models;
-using MicrosoftGraphService.Model;
+﻿using MicrosoftGraphService.Model;
 
 namespace MicrosoftGraphServiceServer
 {
     static class Program
     {
-        private static Server? server;
-
-        static async Task<string> GetEmailsHandler(string request) {
-            GetEmailsRequest? getEmialsRequest = JsonSerializer.Deserialize<GetEmailsRequest>(request);
-            if (getEmialsRequest == null)
-            {
-                return JsonSerializer.Serialize(new ErrorResponse("Invalid request."));
-            }
-
-            try
-            {
-                Graph graph = new Graph(getEmialsRequest.Credentials);
-
-                List<Message> emails = await graph.GetEmails(getEmialsRequest.Top);
-
-                return JsonSerializer.Serialize(new GetEmailsResponse(Utils.MessagesToEmails(emails.ToArray()).ToArray()));
-            } catch(Exception ex) {
-                return JsonSerializer.Serialize(new ErrorResponse($"Failed to retrive emails: {ex.Message}"));
-            }
-        }
-
-        static async Task<string> GetEmailsDetailedHandler(string request)
-        {
-            GetEmailsDetailedRequest? getEmailsDetailedRequest = JsonSerializer.Deserialize<GetEmailsDetailedRequest>(request);
-            if (getEmailsDetailedRequest == null)
-            {
-                return JsonSerializer.Serialize(new ErrorResponse("Invalid request."));
-            }
-
-            try
-            {
-                Graph graph = new Graph(getEmailsDetailedRequest.Credentials);
-
-                List<Message> emails = await graph.GetEmailsDetailed(getEmailsDetailedRequest.Emails);
-
-                return JsonSerializer.Serialize(new GetEmailsDetailedResponse(Utils.MessagesToEmails(emails.ToArray()).ToArray()));
-            }
-            catch (Exception ex)
-            {
-                return JsonSerializer.Serialize(new ErrorResponse($"Failed to retrive detailed emails: {ex.Message}"));
-            }
-            
-        }
-
-        static async Task<string> SendEmailHandler(string request)
-        {
-            SendEmailRequest? sendEmailRequest = JsonSerializer.Deserialize<SendEmailRequest>(request);
-            if (sendEmailRequest == null)
-            {
-                return JsonSerializer.Serialize(new ErrorResponse("Invalid request."));
-            }
-
-            try
-            {
-                Graph graph = new Graph(sendEmailRequest.Credentials);
-
-                await graph.SendEmail(Utils.EmailToMessage(sendEmailRequest.Email));
-
-                return JsonSerializer.Serialize(new OkResponse());
-            }
-            catch (Exception ex)
-            {
-                return JsonSerializer.Serialize(new ErrorResponse($"Failed to send an email: {ex.Message}"));
-            }
-        }
-
-        static async Task<string> DeleteEmailHandler(string request)
-        {
-            DeleteEmailRequest? deleteEmailRequest = JsonSerializer.Deserialize<DeleteEmailRequest>(request);
-            if (deleteEmailRequest == null)
-            {
-                return JsonSerializer.Serialize(new ErrorResponse("Invalid request."));
-            }
-
-            try
-            {
-                Graph graph = new Graph(deleteEmailRequest.Credentials);
-
-                await graph.DeleteEmail(deleteEmailRequest.Email);
-
-                return JsonSerializer.Serialize(new OkResponse());
-            }
-            catch (Exception ex)
-            {
-                return JsonSerializer.Serialize(new ErrorResponse($"Failed to delete an email from the inbox: {ex.Message}"));
-            }
-        }
+        private static readonly NLog.Logger logger = NLog.LogManager.GetCurrentClassLogger();
 
         static void Main(string[] args) {
             try
             {
-                server = new Server("MicrosoftGraphService");
+                Server server = new Server(args.Length > 0 ? args[0] : "MicrosoftGraphService");
 
-                server.SetRequestHandler(RequestType.GET_EMAILS, GetEmailsHandler);
-                server.SetRequestHandler(RequestType.GET_EMAILS_DETAILED, GetEmailsDetailedHandler);
-                server.SetRequestHandler(RequestType.SEND_EMAIL, SendEmailHandler);
-                server.SetRequestHandler(RequestType.DELETE_EMAIL, DeleteEmailHandler);
+                server.SetRequestHandler(
+                    RequestType.GET_EMAILS,
+                    ServerHandlers.GetEmailsHandler
+                );
+                server.SetRequestHandler(
+                    RequestType.GET_EMAILS_DETAILED,
+                    ServerHandlers.GetEmailsDetailedHandler
+                );
+                server.SetRequestHandler(
+                    RequestType.SEND_EMAIL,
+                    ServerHandlers.SendEmailHandler
+                );
+                server.SetRequestHandler(
+                    RequestType.DELETE_EMAIL,
+                    ServerHandlers.DeleteEmailHandler
+                );
 
-                Task.Run(() => {
-                    try
-                    {
-                        server.Listen();
-                    }
-                    catch (Exception)
-                    {
-                        Environment.Exit(1);
-                    }
-                });
+                server.Start();
 
-                Console.ReadLine();
+                int timeout = args.Length > 1 ? Convert.ToInt32(args[1]) : 5;
+                int minutesPassed = 0;
+
+                do
+                {
+                    minutesPassed = Convert.ToInt32(DateTime.Now.Subtract(server.LastRequest).TotalMinutes);
+
+                    logger.Info($"The server is waiting for a connection. {timeout - minutesPassed}m remaining.");
+
+                    Thread.Sleep(60 * 1000);
+                } while (minutesPassed < timeout);
+
+                logger.Info($"No request recived in {timeout}m. Terminating server...");
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                logger.Error(ex);
+
                 Environment.Exit(1);
             }
         }

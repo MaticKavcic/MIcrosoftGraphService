@@ -3,7 +3,7 @@ using System.Text;
 
 namespace MicrosoftGraphService.Shared
 {
-    class PipeServer
+    public class PipeServer
     {
         private static readonly NLog.Logger logger = NLog.LogManager.GetCurrentClassLogger();
 
@@ -22,6 +22,8 @@ namespace MicrosoftGraphService.Shared
 
         public void Listen()
         {
+            logger.Trace("Server is listening for connections...");
+
             pipeServer = new NamedPipeServerStream(
                 pipeName,
                 PipeDirection.InOut,
@@ -38,6 +40,8 @@ namespace MicrosoftGraphService.Shared
 
         protected virtual async Task<string> HandleRequest(string request)
         {
+            logger.Warn("Request recived by a default handler, this method should be overriten.");
+
             return "";
         }
 

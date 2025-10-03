@@ -38,7 +38,6 @@ namespace MicrosoftGraphServiceServer
             catch (Exception ex)
             {
                 logger.Error(ex);
-
                 throw;
             }
         }
@@ -70,7 +69,6 @@ namespace MicrosoftGraphServiceServer
             catch (Exception ex)
             {
                 logger.Error(ex);
-
                 throw;
             }
         }

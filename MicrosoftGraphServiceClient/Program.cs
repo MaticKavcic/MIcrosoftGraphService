@@ -1,17 +1,14 @@
 ﻿using MicrosoftGraphService.Model;
-using System.Text;
 
 namespace MicrosoftGraphServiceClient
 {
     static class Program
     {
-        private static readonly NLog.Logger logger = NLog.LogManager.GetCurrentClassLogger();
-
-        static void Main(string[] args) {
+        static async Task Main(string[] args) {
             try
             {
                 Client client = new Client(
-                    "MicrosoftGraphService",
+                    args.Length > 0 ? args[0] : "MicrosoftGraphService",
                     new Credentials(
                         "",
                         "",
@@ -19,6 +16,8 @@ namespace MicrosoftGraphServiceClient
                         ""
                     )
                 );
+
+                await client.GetEmails(1);
             }
             catch (Exception ex)
             {
